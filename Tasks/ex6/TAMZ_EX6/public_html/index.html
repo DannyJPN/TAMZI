@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>AJAX test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+  
+  <script>
+  
+  
+  function GetSecretCode()
+  {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() 
+  {
+    if (this.readyState == 4 && this.status == 200) 
+	{
+     document.getElementById("recdata").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("POST",document.getElementById("link").value+"?login="+document.getElementById("login").value  , true);
+ 
+        xhttp.send();
+
+  
+  }
+  
+  function TestKey()
+  {
+    var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() 
+  {
+    if (this.readyState == 4 && this.status == 200) 
+	{
+     document.getElementById("recdata").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("POST", document.getElementById("link").value, true);
+  xhttp.setRequestHeader("API-Token",btoa(document.getElementById("login").value+":"+document.getElementById("recdata").innerHTML));
+  xhttp.send();
+
+  
+  }
+  
+  
+  
+  
+  
+  
+  
+  </script>
+  
+    </head>
+    <body>
+        <ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+
+<template id="page1.html">
+    <ons-page id="page1">
+        <ons-toolbar>
+            <div class="center">AJAX</div>
+        </ons-toolbar>
+        <ons-list>
+            
+        </ons-list>
+      <ons-list-item>  <ons-input type="text" id="link" size="300" width="100%"></ons-input></ons-list-item>
+      <ons-list-item>  <ons-input type="text" id="login" size="300" width="100%"></ons-input></ons-list-item>
+	  <ons-list-item>  <ons-input type="text" id="recdata" placeholder = "Received" ></ons-input></ons-list-item>
+	  
+      <ons-list-item>  <ons-button modifier="material" id="codebutton" onclick="GetSecretCode();">Get Secret Code</ons-button>
+        <ons-button modifier="material" id="keybutton" onclick="TestKey();">Test API key</ons-button></ons-list-item>
+    </ons-page>
+</template>
+    </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+    <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+    <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+<script > 
+
+var namesND = ["kozoroh", "vodnar","ryby","beran","byk","blizenci","rak","lev","panna","vahy","stir","strelec"]; 
+
+var descriptsND = {
+"kozoroh":"Charakteristika znamení kozoroh",
+"vodnar":"Charakteristika znamení vodnar",
+"ryby":"Charakteristika znamení ryby",
+"beran":"Charakteristika znamení beran",
+"byk":"Charakteristika znamení byk",
+"blizenci":"Charakteristika znamení blizenci",
+"rak":"Charakteristika znamení rak",
+"lev":"Charakteristika znamení lev",
+"panna":"Charakteristika znamení panna",
+"vahy":"Charakteristika znamení vahy",
+"stir":"Charakteristika znamení stir",
+"strelec":"Charakteristika znamení strelec"}; 
+var breakDate = [21,20,21,21,21,22,23,24,23,23,23,22];
+var globalMonth = 1;
+
+document.addEventListener('init', function(event) {
+    var page = event.target;
+    
+    // po nacteni stranky zobranim aktualni datum a poslu ho do funkce setZodiac
+    if (page.id === 'page1') 
+    {
+        var myDate = new Date();
+        document.getElementById("dateInput").valueAsDate = myDate; 
+        setZodiac(myDate);
+    } 
+ 
+});
+function arrayRotate(arr, reverse) {
+  if (reverse) arr.unshift(arr.pop());
+  else arr.push(arr.shift());
+  return arr;
+}
+//na zaklade data zvolit spravne znameni - obrazek + jmeno
+function setZodiac(myDate)
+{   
+    var year = myDate.getFullYear();
+    var month = myDate.getMonth(); //January is 0
+    var day = myDate.getDate(); 
+
+    for (i = 0; i < 5; i++) {
+      var num = i*2;
+      console.log("num : " + num);
+    }
+
+    //console.log("year : " + year);
+    //alert("year: " + year + " month: " + month + " day: " + day);
+    
+    //TODO 1. bere v potaz pouze mesice - nutne upravit i na dny
+    var shift = day<breakDate[month];
+    var finalindex = shift?month:month+1;
+    if(finalindex >= namesND.length){finalindex-=namesND.length;}
+    var path = "drawable/"+namesND[finalindex]+".png";   
+    document.getElementById("zodImg").src = path;
+    
+    //TODO 2. upravit aby se zobrazoval spravne jmeno znameni 
+    document.getElementById('zodiacName').innerHTML = (namesND[finalindex]);
+    
+    globalMonth = month;   
+    
+}
+
+// klik na obrazek znameni spusti dialog se zakladni informaci o danem znameni a nabidne zobrazeni aktualniho horoskopu
+var showTemplateDialog = function() {
+var myDate = document.getElementById("dateInput").valueAsDate;
+    // TODO 3. zobrazit informace o znameni
+    // napriklad: https://www.horoskopy.cz/charakteristika/beran
+    // https://www.w3schools.com/js/js_switch.asp
+    // https://www.w3schools.com/js/js_if_else.asp
+
+    document.getElementById("p1").innerHTML = descriptsND[ document.getElementById("zodiacName").innerHTML];
+
+    // TODO 5 - BONUS - zobrazi zivotni cislo
+    // http://numerologie.najdise.cz/zivotni-cislo
+    var year = myDate.getFullYear();
+    var month = (myDate.getMonth()+1); //January is 0
+    var day = myDate.getDate(); 
+    
+    var strdate = "";
+    strdate+=strdate.concat(year,month,day);
+    var sum=0;for(var i = 0;i<strdate.length;i++){console.log(strdate[i]);sum+=parseInt(strdate[i])}
+    document.getElementById("p2").innerHTML = "Zivotni cislo je "+sum;
+
+    var dialog = document.getElementById('my-dialog');
+    dialog.show();
+
+};
+
+var hideDialog = function(id) {
+  document
+    .getElementById(id)
+    .hide();
+};
+
+function loadURL()
+{
+    var name = namesND[globalMonth];
+    alert(name);
+    //TODO 4. zobrazeni aktualniho horoskopu
+    // "http://www.horoskopy.cz/" + name
+    //https://www.w3schools.com/js/js_window_location.asp
+}
+
+</script>  
+  
+</head>
+<body>
+
+<ons-page id="page1">
+    <ons-toolbar>
+        <div class="center" style="font-size:200%">
+        Zodiac
+        </div>
+    </ons-toolbar>
+
+    <p style="text-align: center"> <input style="font-size:200%" id="dateInput" type="date" modifier="underbar material" onchange="setZodiac(new Date(this.value));"></input> </p>
+
+    <p style="text-align: center">
+        <img onclick="showTemplateDialog()" id="zodImg" style="width: 30%; height: auto">
+    </p>
+    <p style="text-align: center; font-size:300%" id="zodiacName"> Zodiac </p>
+
+</ons-page>
+
+<ons-dialog id="my-dialog">
+<div style="text-align: center; padding: 10px;">    
+    <p id="p1"></p>
+    <p id="p2"></p>
+    <p> <ons-button onclick="hideDialog('my-dialog')">Close</ons-button> </p>
+    <p> <ons-button onclick="loadURL()">Watch</ons-button> </p>
+    </div>
+</ons-dialog>
+
+</body>
+</html>

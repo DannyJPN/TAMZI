@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+ <script > 
+
+var curList = [];
+var curID=-1;
+var urlCNB = "https://homel.vsb.cz/~mor03/TAMZ/cnb_json.php";
+var date = new Date();
+ var lang = "cs";
+document.addEventListener('init', function(event)
+{
+    if (event.target.id === 'page1')
+    {
+                
+        document.getElementById("datein").valueAsDate = date;
+           document.getElementById("push-button1").value=lang=="cs"?"Vybrat měnu":"Select Currency";
+    document.getElementById("headtitle").value=lang=="cs"?"CNB Převodník":"CNB Convertor";
+    document.getElementById("langbar").value=lang=="cs"?"Vybrat jazyk":"Select language";
+    
+    document.getElementById("datebar").value=lang=="cs"?"Datum":"Date";
+       
+
+        
+        loadCNB();
+           
+        $("#CZK").keyup(function(){
+          //alert("keyup");
+          var currency = curList[curID];
+          var ratio = currency.rate / currency.unit;
+          document.getElementById("CUR").value =document.getElementById("CZK").value / ratio; 
+        });     
+
+        $("#CUR").keyup(function(){
+          //alert("keyup");
+          
+          var currency = curList[curID];
+          var ratio = currency.rate / currency.unit;
+          document.getElementById("CZK").value =document.getElementById("CUR").value * ratio;
+        }); 
+        
+          
+        
+    }
+
+});
+
+function loadCNB()
+{
+    var url=urlCNB+"?lang="+lang+"&date="+todatestring(date);
+    console.log(url);
+    $.getJSON( url, function( json )
+    {
+        curList=[];
+        $("#myP").empty();
+        for(var i = 0; i < json.data.length; i++)
+        {
+          $("#myP").append(json.data[i].country_label );
+          $("#myP").append("</br>" );
+          
+           //jedna z moznosti je ukladat si meny do listu a z neho pak vytvorit ons-list 
+           var myCurrency = json.data[i];
+           curList.push(myCurrency);
+            
+        }                  
+    });    
+}
+
+function addDialog()
+{
+    document.getElementById('dialog-1').show();
+    $("#onsList").empty();
+    for (var i = 0; i < curList.length; i++)
+    {
+        var onsItem= document.createElement('ons-list-item');
+        var todoText =  curList[i].code + " - " + curList[i].country_label;   
+        onsItem.innerHTML = todoText; 
+        onsItem.setAttribute('modifier', "tappable");
+        onsItem.setAttribute('onclick', 'setCountry('+i+')');
+        document.getElementById('onsList').appendChild(onsItem);               
+    }    
+}
+
+function setCountry(id)
+{
+    document.getElementById('dialog-1').hide();
+    $("#curP").text( curList[id].code );
+    curID=id;
+    
+}
+
+function closeDialog()
+{
+    document.getElementById('dialog-1').hide();
+}
+
+
+
+
+function todatestring(date)
+{
+    var day = date.getDate();
+var month = date.getMonth() + 1;
+var year = date.getFullYear();
+
+if (month < 10) month = "0" + month;
+if (day < 10) day = "0" + day;
+
+var datestr = year + "-" + month + "-" + day;   
+    
+    return datestr;
+    
+}
+
+
+function changedate()
+{
+    date=document.getElementById("datein").valueAsDate;
+    loadCNB();
+    
+}
+function changelang()
+{
+    var switchstate = document.getElementById("langswitch").checked;
+    lang=switchstate?"en":"cs";
+    document.getElementById("push-button1").value=lang=="cs"?"Vybrat měnu":"Select Currency";
+    document.getElementById("headtitle").innerHTML=lang=="cs"?"CNB Převodník":"CNB Convertor";
+    document.getElementById("langbar").innerHTML=lang=="cs"?"Vybrat jazyk":"Select language";
+    
+    document.getElementById("datebar").innerHTML=lang=="cs"?"Datum":"Date";
+    
+    loadCNB();
+}
+</script>  
+  
+</head>
+<body>
+<ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+
+<template id="page1.html">
+    <ons-page id="page1">
+        <ons-toolbar>
+            <div class="center" id="headtitle">CNB Převodník</div>
+        </ons-toolbar>
+                <p style="text-align: center"> CZK </p>
+                <p style="text-align: center"> <ons-input id="CZK" modifier="underbar material"></ons-input> </p>
+               
+                <p style="text-align: center" id="curP"> CUR</p>
+                <p style="text-align: center"> <ons-input id="CUR" modifier="underbar material"></ons-input> </p>
+                
+                <p style="text-align: center">
+                <ons-button modifier="material" id="push-button1" onclick="addDialog();">
+                    Vybrat měnu
+                </ons-button>         
+                </p>
+                <p style="text-align: center" id="datebar">
+                    Datum
+                </p>
+                <p style="text-align: center">
+                    <ons-input id="datein" onchange="changedate()" type="date" ></ons-input>
+                </p>
+                <p style="text-align: center" id="langbar">
+                    Vybrat jazyk
+                </p>
+                <p style="text-align: center">
+                    <ons-switch id="langswitch" onchange="changelang()"></ons-switch>
+                </p>
+                
+                <p style="text-align: center" id="myP" >
+                </p>
+    </ons-page>   
+</template>
+
+<ons-dialog id="dialog-1">
+
+  <ons-carousel style="width: 100%; height: 400px" swipeable auto-scroll>
+      <ons-carousel-item>
+      <ons-page>
+       <ons-list id="onsList"></ons-list>
+       </ons-page>
+      </ons-carousel-item>
+    </ons-carousel> 
+    
+</ons-dialog>
+
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+    "name": "WebRegister",
+    "version": "1.0.0",
+    "keywords": [
+        "util",
+        "functional",
+        "server",
+        "client",
+        "browser"
+    ],
+    "author": "Dan Krupa",
+    "contributors": [],
+    "dependencies": {
+        "bower": "^1.8.8",
+        "crypto-js": "^4.0.0"
+    }
+}

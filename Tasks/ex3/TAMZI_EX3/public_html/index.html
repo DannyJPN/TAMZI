@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+        <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+        <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+        <script >
+
+
+
+
+            var rangeHeight, rangeWidth, gender, age, name,bmi;
+
+            document.addEventListener('init', function (event) {
+
+                var page = event.target;
+
+                if (page.id === 'page1')
+                {
+                    $("#push_button").on("click", function (e)
+                    {
+                        
+                        rangeHeight = document.getElementById("height_range").value/100;
+                    rangeWeight = document.getElementById("weight_range").value;
+                    gender_rbs = document.getElementsByName("gender_radio");
+
+                    for (i = 0; i < gender_rbs.length; i++) {
+                        if (gender_rbs[i].checked)
+                            gender = gender_rbs[i].value;
+                        break;
+                    }
+                    age = document.getElementById("age_tb").value;
+                    name= document.getElementById("username_tb").value;
+                    
+                    if(age <1){ons.notification.alert("You are not born yet"); exit;}
+                    if(age >120){ons.notification.alert("There is no point to calculate BMI,since at this age you are most probably already a ghost"); exit;}
+                    
+                    if(name.length <1){ons.notification.alert("You are not named"); exit;}
+                    if(gender == undefined || gender == null){ons.notification.alert("You are genderless"); exit;}
+                     var myNavigator = document.getElementById('myNavigator');
+                        myNavigator.pushPage('page2.html');   
+                  
+                        
+                    });
+                } else if (page.id === 'page2')
+                {
+                       bmi = rangeWeight / (rangeHeight*rangeHeight);
+                    document.getElementById("p_gender").innerHTML = "Gender: " + gender;
+                    document.getElementById("p_username").innerHTML = "Name: " + name;
+                    document.getElementById("p_age").innerHTML = "Age: " + age;
+                    document.getElementById("p_height").innerHTML = "Height: " + rangeHeight;
+                    document.getElementById("p_weight").innerHTML = "Weight: " + rangeWeight;
+                    document.getElementById("p_bmiresult").innerHTML = "Your BMI: " + bmi;
+                    if(bmi < 18.5){comment = "underweight";}
+                    if(bmi >= 18.5 && bmi<25){comment = "normal weight";}
+                    if(bmi >= 25 && bmi<30){comment = "overweight";}
+                    if(bmi >=30 ){comment = "heavily overweight";}
+                    
+                    document.getElementById("p_bminote").innerHTML = "Your BMI is evaluated as " +comment;
+                        
+                       
+                    
+                }
+
+            });
+
+
+document.addEventListener('init', function(event) {
+    
+    var range = $("#weight_range");
+    //Occurs when the text content of an element is changed through the user interface
+    range.on('input', function() {  
+        var myElement = $("#div_weightrange");
+        myElement.text("Weight is "+range.val()+" kg"); 
+    });
+    
+}); 
+document.addEventListener('init', function(event) {
+    
+    var range = $("#height_range");
+    //Occurs when the text content of an element is changed through the user interface
+    range.on('input', function() {  
+        var myElement = $("#div_heightrange");
+        myElement.text("Height is "+range.val()+" cm"); 
+         
+    });
+    
+}); 
+
+        </script>  
+
+    </head>
+    <body>
+    <ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+
+    <template id="page1.html">
+        <ons-page id="page1">
+            <ons-toolbar>
+                <div class="center">Body Mass Index</div>
+            </ons-toolbar>
+
+
+            <ons-list>
+
+                <ons-list-item tappable>
+                    <ons-input id="username_tb" type="text" placeholder="Username"></ons-input>
+                </ons-list-item>   
+                <ons-list-item tappable>
+                    <ons-input id="age_tb" type="number" placeholder="Age"></ons-input>
+                </ons-list-item>   
+
+                <ons-list-item tappable>
+                    <label class="left">
+                        <ons-radio modifier="material" name="gender_radio" input-id="radio_male" value="Male" ></ons-radio>
+                    </label>
+                    <label for="radio_male" class="center">
+                        Male
+                    </label>
+                </ons-list-item>  
+                <ons-list-item tappable>
+                    <label class="left"> 
+                        <ons-radio modifier="material" name="gender_radio" input-id="radio_female" value="Female" ></ons-radio>
+                    </label>
+                    <label for="radio_male" class="center">
+                        Female
+                    </label>
+                </ons-list-item>  
+
+                <ons-list-item tappable>
+                    <div class="center">
+                        <ons-range modifier="material" id="height_range" style="width: 100%;" value="175" min="50" max="250" step="1" ></ons-range>   
+                        <div id="div_heightrange">
+                            Height is 175 cm
+                        </div>   
+                    </div> 
+
+
+                </ons-list-item> 
+                <ons-list-item tappable>
+                    <div class="center">
+                        <ons-range modifier="material" id="weight_range" style="width: 100%;" value="70" min="2" max="250" step="1" ></ons-range>   
+                        <div id="div_weightrange">
+                            Weight is 70 kg
+                        </div>          
+
+                    </div> 
+
+                </ons-list-item> 
+
+
+
+
+                <ons-list-item>
+                    <div class="left"> 
+                        <ons-button modifier="material" id="push_button">CALCULATE</ons-button>
+                </ons-list-item>
+
+            </ons-list>
+
+        </ons-page>
+    </template>
+
+    <template id="page2.html">
+        <ons-page id="page2">
+            <ons-toolbar>
+                <div class="left"><ons-back-button>Page 1</ons-back-button></div>
+                <div class="center"></div>
+            </ons-toolbar>
+
+            <ons-card>
+
+                <div class="title">
+                    BMI Result: 
+                    <p id="bmi"> </p>
+                </div>
+                <div class="content">
+                    <ons-list>
+
+                        <ons-list-item><p id="p_username"> </p></ons-list-item>
+                        <ons-list-item><p id="p_gender"> </p></ons-list-item>
+                        <ons-list-item><p id="p_height"> </p></ons-list-item>
+                        <ons-list-item><p id="p_weight"> </p></ons-list-item>
+                        <ons-list-item><p id="p_age"> </p></ons-list-item>
+                        <ons-list-item><p id="p_bmiresult"> </p></ons-list-item>
+                        <ons-list-item><p id="p_bminote"> </p></ons-list-item>
+
+                    </ons-list>
+                </div>
+
+            </ons-card>   
+
+        </ons-page>
+    </template>
+</body>
+</html>

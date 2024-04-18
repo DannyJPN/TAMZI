@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Register</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+        <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+        <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+        <script src="https://unpkg.com/jquery/dist/jquery.min.js"></script>
+        <script src="crypto-js/crypto-js.js" type="text/javascript"></script>
+        <script src="modernizr-custom.js" type="text/javascript"></script>
+        <script type="text/javascript" src="how-to-capture-picture-from-webcam-with-webcam-js/webcamjs/webcam.min.js"></script>
+        <script>
+
+            document.addEventListener('init', function (event)
+            {
+                var page = event.target;
+
+
+                switch (page.id)
+                {
+                    case 'register':
+                    {
+                        Webcam.set({
+                            width: 414,
+                            height: 531,
+                            image_format: 'png',
+                            jpeg_quality: 90
+                        });
+                        Webcam.attach('#camera');
+
+
+                        break;
+                    }
+                    case 'login':
+                    {
+                        document.getElementById("username_tb").value = "";
+                        document.getElementById("password_tb").value = "";
+
+                        break;
+                    }
+                    case 'search':
+                    {
+
+                        showChildren();
+                        break;
+                    }
+                    case 'assigngroups':
+                    {
+                        fillchildselect();
+                        fillgroupselect();
+                        break;
+                    }
+                    case 'major':
+                    {
+
+                        break;
+                    }
+
+
+
+
+                }
+
+
+            });
+
+            function search()
+            {
+                var searchval = document.getElementById("search_tb").value;
+
+                showChildren(searchval);
+
+            }
+
+            function fillchildselect()
+            {
+                var select = document.createElement("select");
+                $(select).attr('id', 'childSelector');
+                $("#childselect").empty();
+                for (var i = 0; i < localStorage.length; i++)
+                {
+                    var myKey = localStorage.key(i);
+
+                    var childStr = JSON.parse(localStorage.getItem(myKey));
+                    var opt = document.createElement("option");
+                    opt.value = myKey;
+                    opt.innerHTML = childStr.surname + " " + childStr.name;
+                    select.appendChild(opt);
+
+                }
+                $("#childselect").append(select);
+
+
+
+            }
+            var groups = ["Vaření", "Tanec", "Florbal", "Stolní tenis", "Výtvarka"];
+       
+			
+			function checkgroups()
+            {
+                var childlist = document.getElementById("childSelector");
+                var key = childlist.options[childlist.selectedIndex].value;
+                var child = JSON.parse(localStorage.getItem(key));
+                var elements = [];
+                var length = $("#groupselect .list-item").length;
+               
+                if (length > 0 && child != undefined && child != null)
+                {
+                    var childgroups=child.groups.split(";");
+
+                    for (var i = 0; i < length; i++) 
+					{
+                        
+                        elements.push($("#label_chg_" + i).html());
+                    }
+                    
+                    for (var i = 0; i < length; i++) 
+					{                      
+                        if (childgroups.includes(elements[i])) 
+						{
+                            document.getElementById("group_cb_" + i).checked = true;
+                        }
+                        else 
+						{
+                            document.getElementById("group_cb_" + i).checked = false;
+                        }
+                    }
+                }
+            }
+			
+			
+
+
+
+
+
+
+
+
+            function fillgroupselect()
+            {
+                $("#groupselect").empty();
+                var i = 0;
+
+                for (element in groups)
+                {
+                    var item = document.createElement("ons-list-item");
+                    item.setAttribute('modifier', "tappable");
+                    var chb = document.createElement("ons-checkbox");
+                    chb.value = element;
+
+                    var label = document.createElement("label");
+                    label.id = "label_chg_" + i;
+                    label.for = "group_cb_" + i;
+                    
+                    label.innerHTML = groups[element];
+                    chb.id = "group_cb_" + i;
+
+
+                    item.appendChild(chb);
+                    item.appendChild(label);
+                    document.getElementById("groupselect").appendChild(item);
+
+
+                    i++;
+                }
+
+
+
+
+            }
+
+ 
+
+            function selectgroups()
+            {
+
+                var childselector = document.getElementById("childselect");
+                var childkey = childselector.options[childselector.selectedIndex].value;
+                var child = JSON.parse(localStorage.getItem(childkey));
+                var chosengroups = "";
+                
+                for (var i = 0; i < $("#groupselect .list-item").length; i++)
+                {
+                    if (document.getElementById("group_cb_" + i).checked)
+                    {
+                        var checkbox = $('#group_cb_' + i).html();
+                        
+                        chosengroups += groups[$(checkbox).attr("value")] + ';';
+                    }
+
+
+                }
+                chosengroups = chosengroups.substring(0, chosengroups.length - 1);
+
+                child.groups = chosengroups;
+                localStorage.setItem(childkey, JSON.stringify(child));
+            }
+            function login()
+            {
+
+                var creds =
+                        {
+                            "kru0142": "8a767e24daa59f1279621fcc6607a036ef090a099e88aa43655b274329a8750d", //TAMZI
+                            "jan0010": "1c8bfe8f801d79745c4631d09fff36c82aa37fc4cce4fc946683d7b336b63032", //letmein
+                            "sle0123": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"//password
+                        }
+
+                var username = document.getElementById("username_tb").value;
+                var password = document.getElementById("password_tb").value;
+
+                if (creds[username] == CryptoJS.SHA256(password))
+                {
+                    var navigator = document.getElementById("pagechanger");
+                    navigator.pushPage("major.html");
+                } else
+                {
+                    alert("Login incorrect");
+                }
+            }
+
+            function takephoto()
+            {
+                Webcam.snap(function (data_uri) {
+
+                    document.getElementById('camera').innerHTML =
+                            '<img id="childphoto" src="' + data_uri + '"/>';
+                });
+
+            }
+
+
+            function showChildren(filter = "")
+            {
+
+                $("#ChildList").empty();
+
+                for (var i = 0; i < localStorage.length; i++)
+                {
+
+
+                    var myKey = localStorage.key(i);
+
+                    var childStr = JSON.parse(localStorage.getItem(myKey));
+
+
+                    var reg = new RegExp(filter.toLowerCase());
+
+                    if (reg.test(childStr.surname.toLowerCase()) || reg.test(childStr.name.toLowerCase()))
+                    {
+
+                        var childgroups = childStr.groups;
+                        var grouplist = "";
+                        if (groups != "")
+                        {
+                            grouplist = childgroups.replace(/;/g, "</br>");
+                        }
+                        var onsItem = '<ons-list-item expandable>' + '<div class="incolumn"><div class="header">' +
+                                childStr.surname + ' ' + childStr.name + '</div>' +
+                                '<div class="expandable-content">' +
+                                '<table id="expantable" border="solid">' +
+                                '<tr id="tr0"><td id="td_photo" colspan="2"><div id="profilephoto_div"><img id="profilephoto" src="' + childStr.photo + '" /></div></td></tr>' +
+                                '<tr id="tr1"> <td id="td_birthdate_lb">Datum narození:</td> <td id="td_birthdate_val">' + childStr.birthdate + '</td></tr>' +
+                                '<tr id="tr2"> <td id="td_address_lb">Adresa:</td> <td id="td_address_val">' + childStr.street + ' ' + childStr.orinum + '/' + childStr.desnum + '</td></tr>' +
+                                '<tr id="tr3"> <td id="td_city_lb">Obec</td> <td id="td_city_val">' + childStr.city + ' ' + childStr.citypart + '</td></tr>' +
+                                '<tr id="tr4"> <td id="td_GDPR" colspan="2">' + (childStr.GDPR ? 'Souhlasím s GDPR' : 'Nesouhlasím s GDPR') + ' </td></tr>' +
+                                '<tr id="tr5"> <td id="td_photoagree" colspan="2">' + (childStr.photoagree ? 'Souhlasím s fotografováním' : 'Nesouhlasím s fotografováním') + '</td></tr>' +
+                                '<tr id="tr6"> <td id="td_leaving" colspan="2">' + (childStr.leaving ? 'Odchod bez doprovodu' : 'Odchod s doprovodem') + '</td></tr>' +
+                                '<tr id="tr7"> <td id="td_group_lb">Kroužek:</td> <td id="td_group_val">' + grouplist + '</td></tr>' +
+                                '<tr id="tr8"> <td id="td_remove_button" colspan="2"><ons-button id="removebutton" onclick="removechild(' + myKey + ')">smazat</ons-button></td></tr>' +
+                                '</table></div></div>' +
+                                '</ons-list-item>';
+
+
+                        document.getElementById('ChildList').innerHTML += onsItem;
+
+                    }
+
+
+
+            }
+            }
+
+            function newreg()
+            {
+                var navigator = document.getElementById("pagechanger");
+                navigator.pushPage("register.html");
+
+            }
+            function newgroupassign()
+            {
+                var navigator = document.getElementById("pagechanger");
+                navigator.pushPage("assigngroups.html");
+
+            }
+            function newsearch()
+            {
+                var navigator = document.getElementById("pagechanger");
+                navigator.pushPage("search.html");
+                showChildren();
+
+            }
+
+
+
+            function addchild()
+            {
+
+
+
+                var myKey = findFirstAvailable();
+
+                var childname = document.getElementById("childname_tb").value;
+                var childsurname = document.getElementById("childsurname_tb").value;
+                var birthdate = document.getElementById("birthdate").value;
+                var street = document.getElementById("street_tb").value;
+                var orinum = document.getElementById("orinum_num").value;
+                var desnum = document.getElementById("desnum_num").value;
+                var city = document.getElementById("city_tb").value;
+                var citypart = document.getElementById("citypart_tb").value;
+                var notes = document.getElementById("notes_ta").value;
+                var GDPR = document.getElementById("GDPR_sw").checked;
+                var photoagree = document.getElementById("Photo_sw").checked;
+                var leaving = document.getElementById("Leaving_sw").checked;
+                var groups = "";
+
+
+
+
+var dataURL="";
+try{
+
+                var childphoto = document.getElementById("childphoto");
+                var canv = document.createElement("canvas");
+                var context = canv.getContext("2d");
+                canv.width = childphoto.width;
+                canv.height = childphoto.height;
+
+                context.drawImage(childphoto, 0, 0);
+                dataURL = canv.toDataURL("image/png");
+                }
+                catch(e)
+                {
+                    
+                    dataURL="";
+                }
+
+                if (orinum>0 && desnum>0 && childname.length >0 && childsurname.length >0)
+                {
+                    var child = {
+                        name: childname,
+                        surname: childsurname,
+                        birthdate: birthdate,
+                        street: street,
+                        orinum: orinum,
+                        desnum: desnum,
+                        city: city,
+                        citypart: citypart,
+                        notes: notes,
+                        GDPR: GDPR,
+                        photoagree: photoagree,
+                        leaving: leaving,
+                        groups: groups,
+                        photo: dataURL
+
+                    };
+                    localStorage.setItem(myKey, JSON.stringify(child));
+                }
+
+
+                alert("Dítě " + childname + " " + childsurname + " bylo zaregistrováno");
+                var navigator = document.getElementById("pagechanger");
+                Webcam.reset();
+                navigator.pushPage("search.html");
+                showChildren();
+
+
+
+
+
+            }
+            function todatestring(date)
+            {
+                var year = date.getFullYear();
+                var month = (date.getMonth() + 1); //January is 0
+                var day = date.getDate();
+                return day + "." + month + "." + year;
+            }
+            function removechild(id)
+            {
+
+                localStorage.removeItem(id);
+
+                showChildren();
+
+            }
+
+            function removeAll()
+            {
+                ons.notification.alert("Remove All Items");
+
+                localStorage.clear();
+
+
+            }
+            function findFirstAvailable()
+            {
+                var keys = [];
+                for (var i = 0; i < localStorage.length; i++)
+                {
+
+
+                    keys.push(localStorage.key(i));
+
+
+                }
+                keys.sort();
+                for (var i = 0; i < keys.length; i++)
+                {
+
+
+                    if (keys[i] != i + 1)
+                    {
+                        return i + 1;
+
+                    }
+
+                }
+                return keys.length + 1;
+            }
+
+            function getmajor()
+            {
+                var navigator = document.getElementById("pagechanger");
+                navigator.pushPage("major.html");
+
+            }
+        </script>
+
+
+        <style>
+
+            .incolumn
+            {
+                display:flex;
+                flex-direction: column;
+
+
+            }
+
+
+            ons-switch
+            {
+                max-width: 150px;
+
+
+            }
+
+
+            ons-button
+            {
+                width:100%;
+                height:100%;
+
+            }
+        </style>
+
+    </head>
+    <body>
+    <ons-navigator swipeable id="pagechanger" page="login.html"></ons-navigator>
+    <template id="major.html">
+        <ons-page id="major">
+            <ons-list>
+                <ons-list-item>
+                    <ons-button  id="addbutton" onclick="newgroupassign()">Nový zápis</ons-button>
+                </ons-list-item>
+
+                <ons-list-item>
+                    <ons-button  id="registerbutton" onclick="newreg()">Nová registrace</ons-button>
+                </ons-list-item>
+                <ons-list-item>
+                    <ons-button  id="searchbutton" onclick="newsearch()">Vyhledat dítě</ons-button>
+                </ons-list-item>
+            </ons-list>
+
+        </ons-page>
+
+
+    </template>
+    <template id="login.html">
+        <ons-page id="login">
+            <ons-list>
+                <ons-list-item>
+                    <ons-input id="username_tb" placeholder="login" class="incolumn" ></ons-input>
+                </ons-list-item>
+
+                <ons-list-item>
+                    <ons-input type="password" id="password_tb" placeholder="heslo" class="incolumn" ></ons-input>
+                </ons-list-item>
+                <ons-list-item>
+                    <ons-button  id="loginbutton" onclick="login()">Přihlásit se</ons-button>
+                </ons-list-item>
+            </ons-list>
+
+        </ons-page>
+
+
+
+    </template>
+    <template id="register.html">
+        <ons-page id="register">
+            <ons-list>
+
+                <ons-list-item tappable><label for="childname_tb" class="incolumn" >  Jméno</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn"> <ons-input id="childname_tb"  type="text" placeholder="jméno"   ></ons-input></label></ons-list-item>
+
+
+
+                <ons-list-item tappable><label class="incolumn"  for="childsurname_tb">  Příjmení</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="childsurname_tb" type="text"  placeholder="příjmení"  ></ons-input></label></ons-list-item>
+
+
+                <ons-list-item tappable><label class="incolumn"  for="birthdate">  Datum narození</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input style="font-size:100%" id="birthdate" type="date"    ></ons-input></label></ons-list-item>
+
+
+                <ons-list-item tappable><label class="incolumn"  for="street_tb">  Ulice</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="street_tb" type="text" placeholder="ulice"  ></ons-input></label></ons-list-item>
+
+
+
+                <ons-list-item tappable><label class="incolumn"  for="orinum_num">  Číslo orientační</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="orinum_num" type="number"   ></ons-input></label></ons-list-item>
+
+
+                <ons-list-item tappable><label class="incolumn"  for="desnum_num">  Číslo popisné</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="desnum_num" type="number"  ></ons-input></label></ons-list-item>
+
+
+                <ons-list-item tappable><label class="incolumn"  for="city_tb">  Obec</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="city_tb" type="text" placeholder="obec"  ></ons-input></label></ons-list-item>
+
+
+
+                <ons-list-item tappable><label class="incolumn"  for="citypart_tb">  Část obce,pokud existuje</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" ><ons-input id="citypart_tb" type="text" placeholder="část obce"  ></ons-input></label></ons-list-item>
+
+
+
+                <ons-list-item tappable><label class="incolumn"  for="notes_ta">  Vaše připomínky pro nás</label></ons-list-item>
+                <ons-list-item tappable><label class="incolumn" > <textarea id="notes_ta"  placeholder="Vaše připomínky" rows="5" ></textarea> </label >
+
+
+                    <ons-list-item tappable><label class="incolumn"  for="GDPR_sw">  Souhlasím s GDPR</label>
+                        <label class="incolumn" > <ons-switch id="GDPR_sw" class="center"></ons-switch></label >
+
+
+                        <ons-list-item tappable><label class="incolumn"  for="Photo_sw" >  Souhlasím s focením</label>
+                            <label class="incolumn" ><ons-switch id="Photo_sw" class="center"></ons-switch></label >
+
+
+                            <ons-list-item tappable><label class="incolumn"  for="Leaving_sw">  Odchod bez doprovodu</label>
+                                <label class="incolumn" > <ons-switch id="Leaving_sw" class="center"></ons-switch></label ></ons-list-item>
+
+                            <ons-list-item>
+
+                                <div class="incolumn" id="camera" ></div>
+
+                            </ons-list-item>
+                            <ons-list-item tappable>
+
+                                <div class="incolumn" >  <ons-button id="Save_b" onclick="takephoto()" >Vyfotit</ons-button> </div >
+                            </ons-list-item>
+                            <ons-list-item tappable>
+
+                                <div class="incolumn" > <ons-button id="Save_b" onclick="addchild()" >Uložit</ons-button></div >
+                            </ons-list-item>
+                            <ons-list-item tappable>
+
+                                <div class="incolumn" >  <ons-button id="Back_b" onclick="getmajor()" >Zpět</ons-button></div > 
+                            </ons-list-item>
+
+                            </ons-list>
+
+
+
+                            </ons-page>
+
+
+
+                            </template>
+                            <template id="search.html">
+                                <ons-page id="search">
+                                    <ons-list id="searchlist">
+                                        <ons-list-item tappable>   <div class="incolumn"><ons-input  id="search_tb" type="text" placeholder="vyhledat"  ></ons-input></div></ons-list-item>
+                                        <ons-list-item tappable>    <div class="incolumn"><ons-button  id="searchbutton" onclick="search()" width="100%" height="100%">Hledat</ons-button></div></ons-list-item>
+                                        <ons-list-item tappable>    <div class="incolumn">
+                                                <ons-list id="ChildList">
+
+
+                                                </ons-list> </div>
+                                        </ons-list-item>
+                                        <ons-list-item>
+                                            <div class="incolumn" >  <ons-button id="Back_b" onclick="getmajor()" >Zpět</ons-button></div >                 
+                                        </ons-list-item>
+
+
+                                    </ons-list>
+
+
+                                </ons-page>
+
+
+
+                            </template>
+                            <template id="assigngroups.html">
+                                <ons-page id="assigngroups">
+                                    <ons-list>
+                                        <ons-list-item>
+                                            <div class="incolumn" > 
+                                                <ons-select id="childselect" onchange="checkgroups()">
+                                                </ons-select>
+                                            </div>
+                                        </ons-list-item>
+                                        <ons-list-item>
+                                            <div class="incolumn" > 
+                                                <ons-list id="groupselect">
+                                                </ons-list>
+                                            </div>
+                                        </ons-list-item>
+                                        <ons-list-item>
+                                            <div class="incolumn" >     
+                                                <ons-button id="groupadd_button" onclick="selectgroups()">Zapsat</ons-button> 
+                                            </div>
+                                        </ons-list-item>
+                                        <ons-list-item>
+                                            <div class="incolumn" >
+                                                <ons-button id="Back_b" onclick="getmajor()" >Zpět</ons-button>
+                                            </div >
+                                        </ons-list-item>               
+                                    </ons-list>
+
+                                </ons-page>
+
+
+
+                            </template>
+
+                            </body>
+                            </html>
+
